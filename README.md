@@ -112,13 +112,13 @@ npm run verify:mac -- arm64
 npm run smoke:mac -- arm64
 ```
 
-产物为 `release/LingHui-1.0.2-mac-arm64.dmg` 和 `.zip`。验证包括 Mac 可执行架构、资源哈希、摄像头用途说明、临时签名、DMG 完整性，以及解压发布 ZIP 后实际启动应用进行模型推理。Intel CI 虚拟机的默认图形后端不可用，启动检查显式使用 OpenGL 后端；普通用户启动不带此参数。
+产物为 `release/LingHui-1.0.2-mac-arm64.dmg` 和 `.zip`。验证包括 Mac 可执行架构、资源哈希、摄像头用途说明、临时签名、DMG 完整性，以及解压发布 ZIP 后实际启动应用进行模型推理。Intel 云端虚拟机缺少可用 Metal 图形环境，因此 x64 发布包在 Apple 芯片 runner 上通过 Rosetta 启动验证；尚未验证 Intel 原生硬件。
 
 ## GitHub 自动构建与 Release
 
 配置在 .github/workflows/windows-release.yml。将源码和 package-lock.json 推送到自己的 GitHub 仓库并启用 Actions 后：
 
-- 普通分支推送、Pull Request、手动运行：Windows、Apple 芯片 Mac 和 Intel Mac runner 分别测试、打包并运行应用自检；通过后在 Actions Artifacts 中提供各平台安装包，保留 14 天。
+- 普通分支推送、Pull Request、手动运行：Windows、Apple 芯片 Mac 和 Mac Rosetta 环境分别测试、打包并运行应用自检；通过后在 Actions Artifacts 中提供各平台安装包，保留 14 天。
 - 推送 v 开头的版本标签：标签必须与 package.json 的版本完全一致；全部检查通过后，自动创建 Release 并上传 Windows exe、两种 Mac 架构的 DMG/ZIP 和汇总 SHA256SUMS.txt。含连字符的预发布版本会标为 Pre-release。
 - 发布使用仓库自带的 GITHUB_TOKEN，仅发布 job 申请 contents: write，不需要将个人访问令牌写进源码。
 - 已公开发布的同名 Release 不会被覆盖；失败留下的草稿可以重新运行工作流补齐并发布。
