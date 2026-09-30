@@ -20,7 +20,7 @@ try{
   execFileSync('/usr/bin/codesign',['--verify','--deep','--strict',app],{stdio:'inherit'});
   const executable=execFileSync('/usr/libexec/PlistBuddy',['-c','Print :CFBundleExecutable',path.join(app,'Contents/Info.plist')],{encoding:'utf8'}).trim();
   const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;
-  const result=spawnSync(path.join(app,'Contents/MacOS',executable),['--smoke-test','--smoke-result='+report],{env,encoding:'utf8',timeout:90000});
+  const result=spawnSync(path.join(app,'Contents/MacOS',executable),['--smoke-test','--smoke-result='+report],{env,encoding:'utf8',timeout:architecture==='x64'&&process.arch==='arm64'?300000:90000});
   if(result.stdout)console.log(result.stdout);
   if(result.stderr)console.error(result.stderr);
   if(result.error)throw result.error;
