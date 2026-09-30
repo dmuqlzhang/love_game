@@ -87,6 +87,8 @@ jobs:
       - run: npm run verify:mac -- ${{ matrix.arch }}
       - name: Run distributed Mac app and real hand model without a camera
         run: npm run smoke:mac -- ${{ matrix.arch }}
+        env:
+          MAC_SMOKE_SOFTWARE_GL: ${{ matrix.arch == 'x64' && '1' || '0' }}
       - name: Save Mac packages and checksums
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

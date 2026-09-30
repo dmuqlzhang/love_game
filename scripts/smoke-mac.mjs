@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {mkdtemp,readFile,rm,mkdir} from 'node:fs/promises';
+import {mkdtemp,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -20,7 +20,9 @@ try{
   execFileSync('/usr/bin/codesign',['--verify','--deep','--strict',app],{stdio:'inherit'});
   const executable=execFileSync('/usr/libexec/PlistBuddy',['-c','Print :CFBundleExecutable',path.join(app,'Contents/Info.plist')],{encoding:'utf8'}).trim();
   const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;
-  const result=spawnSync(path.join(app,'Contents/MacOS',executable),['--smoke-test','--smoke-result='+report],{env,encoding:'utf8',timeout:90000});
+  // Intel hosted runners lack a usable GPU. Only this explicit CI check uses software GL.
+  const graphics=env.MAC_SMOKE_SOFTWARE_GL==='1'?['--use-angle=swiftshader','--enable-unsafe-swiftshader']:[];
+  const result=spawnSync(path.join(app,'Contents/MacOS',executable),[...graphics,'--smoke-test','--smoke-result='+report],{env,encoding:'utf8',timeout:90000});
   if(result.stdout)console.log(result.stdout);
   if(result.stderr)console.error(result.stderr);
   if(result.error)throw result.error;
