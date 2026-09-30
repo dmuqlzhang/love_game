@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080d16" />
+  <title>灵绘 · 星光花束</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="灵绘首页"><span class="brand-mark">✳</span><span>灵绘<span class="brand-en">AIR DRAW LAB</span></span></a>
+      <div class="top-note"><span class="live-dot"></span>让灵感，触手可及</div>
+      <span class="local-tag"><svg viewBox="0 0 24 24"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"/><path d="m8 12 3 3 5-6"/></svg>本地处理 · 画面不上传</span>
+    </header>
+    <main>
+      <section class="intro"><div><div class="eyebrow">GESTURE × CREATIVITY</div><h1>把指尖的想象，<span>画进空气里。</span></h1><p>伸出食指落笔，轻轻捏合移动。你的手，就是画笔。</p></div><div class="version">交互实验 <span>01 / AIR CANVAS</span></div></section>
+      <nav class="mode-nav" aria-label="创作模式">
+        <div class="mode-switch"><button id="romance-mode" class="mode-tab selected" aria-pressed="true"><span>♡</span> 星光花束</button><button id="drawing-mode" class="mode-tab" aria-pressed="false">自由画布</button></div>
+        <span class="dedication" id="dedication">FOR <b id="recipient-name"></b> <span>·</span> 今晚的温柔，只送给你</span>
+      </nav>
+      <p id="config-warning" class="config-warning" role="status" hidden></p>
+      <div class="workspace">
+        <section class="canvas-panel" aria-label="创作区域">
+          <div class="panel-top"><div class="canvas-title"><span class="small-star">✧</span> 无限灵感画布 <span class="beta">LIVE</span></div><div class="panel-actions"><button id="save" class="icon-button" title="保存画布 PNG" aria-label="保存画布 PNG"><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/></svg></button><button id="fullscreen" class="icon-button" title="仅画布全屏（Esc 退出，数字键 1–5 操作）" aria-label="全屏画布"><svg viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button></div></div>
+          <div id="stage" class="stage">
+            <canvas id="canvas" aria-label="隔空绘画画布，鼠标按住左键绘制，拖动模式下抓取笔迹" tabindex="0"></canvas>
+            <div class="stage-top"><span id="input-badge" class="stage-badge"><i></i>示例预览</span><span class="stage-coordinate">AIRSPACE / 001</span></div>
+            <div id="welcome" class="welcome"><span class="welcome-kicker">YOUR HAND. YOUR MAGIC.</span><h2>一笔，唤醒灵感。</h2><p>开启摄像头，用手势开始创作<br/>也可以直接用鼠标在这里画画</p><span class="demo-label">背景为示例图案 · 开始绘制时自动清除</span></div>
+            <div class="stage-bottom"><span id="gesture-status">等待你的第一笔</span><span id="frame-stats">— FPS <b>/</b> — ms</span></div>
+            <div id="toast" class="toast" role="status" aria-live="polite"></div>
+          </div>
+          <div class="romance-toolbar" id="romance-toolbar" aria-label="浪漫表演控制">
+            <div class="romance-actions">
+              <button id="romance-stars" data-action="stars"><span class="romance-action-icon">✦</span><span>点亮星星<small>比 V</small></span><kbd>1</kbd></button>
+              <button id="romance-flower" data-action="flower"><span class="romance-action-icon">❀</span><span>掌心开花<small>张开手掌</small></span><kbd>2</kbd></button>
+              <button id="romance-gather" data-action="gather"><span class="romance-action-icon">♡</span><span>汇聚成心<small>握拳</small></span><kbd>3</kbd></button>
+              <button id="romance-reveal" data-action="reveal" disabled><span class="romance-action-icon">✉</span><span>送出告白<small>再次张掌</small></span><kbd>4</kbd></button>
+            </div>
+            <div class="fireworks-controls">
+              <button id="romance-fireworks" data-action="fireworks"><span class="fireworks-glyph">✺</span><span>漫天烟花<small>🤟 我爱你手势</small></span><kbd>5</kbd></button>
+              <div class="fireworks-sound-controls"><button id="fireworks-sound" aria-pressed="false">开启音效</button><label for="fireworks-volume">音量 <output id="fireworks-volume-value">35%</output></label><input id="fireworks-volume" aria-label="烟花音量" type="range" min="0" max="100" value="35" step="5"/></div>
+            </div>
+            <p id="fireworks-status" class="fireworks-status" role="status">🤟 拇指、食指、小指伸出 · 保持 0.6 秒</p>
+            <div class="romance-caption"><span id="romance-hint" role="status">比 V 点亮星星，或点击按钮开始</span><button id="romance-reset" title="重新开始 (R)">重新开始 <span>↺</span></button></div>
+          </div>
+          <p class="sr-only" id="romance-accessible" aria-live="polite"></p>
+          <div class="toolbar" id="drawing-toolbar"><div class="tool-group" role="group" aria-label="鼠标工具"><button class="tool active" id="draw-tool" aria-pressed="true" title="画笔 (D)"><svg viewBox="0 0 24 24"><path d="m15 4 5 5L8 21H3v-5ZM13 6l5 5"/></svg><span>画笔</span><kbd>D</kbd></button><button class="tool" id="move-tool" aria-pressed="false" title="移动 (V)"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18m-13-5 4-4 4 4m-8 10 4 4 4-4M7 8l-4 4 4 4m10-8 4 4-4 4"/></svg><span>移动</span><kbd>V</kbd></button></div><div class="toolbar-right"><button id="finish" class="text-button" title="完成当前图形 (Enter)">完成图形 <kbd>↵</kbd></button><span class="separator"></span><button id="undo" class="icon-button" title="撤销上一笔 (Ctrl / Cmd + Z)" aria-label="撤销上一笔"><svg viewBox="0 0 24 24"><path d="m8 5-5 5 5 5M3 10h12a6 6 0 0 1 0 12"/></svg></button><button id="clear" class="icon-button" title="清空画布 (C)" aria-label="清空画布"><svg viewBox="0 0 24 24"><path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7"/></svg></button></div></div>
+        </section>
+        <aside class="sidebar">
+          <section class="control-card"><div class="section-label">连接你的双手 <span>01</span></div><div class="camera-state"><div id="camera-icon" class="camera-icon"><svg viewBox="0 0 24 24"><path d="M3 7h12v11H3ZM15 11l6-4v11l-6-4"/></svg></div><div><h3 id="camera-title">摄像头未开启</h3><p id="camera-desc">准备好，施展一点小魔法</p></div></div><button id="camera-button" class="primary-button"><svg viewBox="0 0 24 24"><path d="M12 3v9M6 6a9 9 0 1 0 12 0"/></svg><span>开启摄像头</span><span class="button-arrow">↗</span></button><div id="error" class="error-message" role="alert" hidden></div><p class="privacy-note">仅使用摄像头，不录音、不上传</p><button id="mouse-button" class="mouse-button">先用鼠标体验 <span>→</span></button></section>
+          <section class="romance-guide" id="romance-guide">
+            <div class="section-label">一场只属于你们的星光 <span>02</span></div>
+            <ol class="story-steps">
+              <li data-phase="garden" class="current"><span>01</span><div><h3>把想念，变成星光与花</h3><p>比 V 出星星，张掌开花<br/>捏合附近的星花，可以移动</p></div></li>
+              <li data-phase="heart"><span>02</span><div><h3>把温柔，汇成一颗心</h3><p>握拳稍作停留<br/>让每一点星光找到归处</p></div></li>
+              <li data-phase="reveal"><span>03</span><div><h3>把心里的话，送给她</h3><p>等爱心成形，再次张开手掌<br/>名字先出现，告白缓缓展开</p></div></li>
+            </ol>
+            <div class="romance-counter"><span id="romance-count">0 颗星 · 0 朵花</span><span>✧</span></div>
+            <p class="romance-timing">🤟 拇指、食指、小指伸出，让烟花铺满夜空。手势保持约 0.6 秒，换一个手势再重复；数字键 1–5 也能表演。</p>
+          </section>
+          <section class="guide-card" id="drawing-guide"><div class="section-label">三步，把想象变成形状 <span>02</span></div><div class="gesture-step"><span class="gesture-glyph">☝</span><div><h3>食指伸出，隔空落笔</h3><p>收起其余手指，移动食指画线</p></div><span class="step-number">01</span></div><div class="gesture-step"><span class="gesture-glyph pinch-glyph">⌁</span><div><h3>指尖捏合，轻松抓取</h3><p>在笔迹附近捏合拇指与食指</p></div><span class="step-number">02</span></div><div class="gesture-step"><span class="gesture-glyph">✋</span><div><h3>松开指尖，自由放置</h3><p>放下图形，继续下一次创作</p></div><span class="step-number">03</span></div><div class="guide-tip"><span>✦</span>多笔画完后按 Enter 合为一个图形</div></section>
+          <section class="settings-card"><div class="section-label">让手感，更合心意 <span>03</span></div><label class="setting"><span>手部骨架<span class="setting-desc">显示指尖与关节连线</span></span><input id="skeleton" type="checkbox" role="switch" checked/><i class="switch"></i></label><label class="setting"><span>摄像头背景<span class="setting-desc">叠加真实画面</span></span><input id="background" type="checkbox" role="switch"/><i class="switch"></i></label><label class="setting"><span>镜像跟随<span class="setting-desc">像照镜子一样自然</span></span><input id="mirror" type="checkbox" role="switch" checked/><i class="switch"></i></label><div class="smoothing-row"><label for="smoothing">指尖防抖</label><span id="smoothing-value">适中</span></div><input id="smoothing" class="range" type="range" min="0" max="2" value="1" step="1" aria-label="指尖防抖强度"/><div class="range-labels"><span>更灵敏</span><span>更平稳</span></div></section>
+        </aside>
+      </div>
+      <footer><span><i class="live-dot"></i>无需穿戴设备，一只摄像头就够了</span><span>光线充足 · 手掌完整入镜 · 保持适当距离</span><span class="footer-sign">MADE FOR CURIOUS HANDS ✳</span></footer>
+    </main>
+  </div>
+  <video id="video" playsinline muted hidden></video>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

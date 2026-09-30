@@ -1,0 +1,15 @@
+{
+  "appId": "local.linghui.airdraw",
+  "productName": "灵绘",
+  "directories": {"output": "release"},
+  "files": ["dist/**/*", "desktop/**/*", "package.json"],
+  "asar": true,
+  "npmRebuild": false,
+  "win": {
+    "target": [{"target": "portable", "arch": ["x64"]}],
+    "executableName": "LingHui",
+    "artifactName": "LingHui-${version}-win-${arch}.${ext}",
+    "signAndEditExecutable": false
+  },
+  "portable": {"requestExecutionLevel": "user"}
+}
