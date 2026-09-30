@@ -1,6 +1,6 @@
 {
   "name": "airdraw-lab",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "灵绘：本地手势画布、星光告白与烟花",
   "main": "desktop/main.js",

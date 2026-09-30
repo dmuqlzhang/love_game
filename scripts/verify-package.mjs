@@ -4,7 +4,7 @@ import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
-import asar from '@electron/asar';
+import {extractBundledFile} from './package-paths.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 const {version}=JSON.parse(await readFile(path.join(root,'package.json'),'utf8'));
@@ -41,13 +41,13 @@ await verifyPE(path.join(output,'win-unpacked/LingHui.exe'),0x8664);
 const files=[...await filesUnder(path.join(root,'dist')),...await filesUnder(path.join(root,'desktop'))];
 for(const file of files){
   const relative=path.relative(root,file).split(path.sep).join('/');
-  assert.equal(hash(asar.extractFile(archive,relative)),hash(await readFile(file)),'Bundled resource mismatch: '+relative);
+  assert.equal(hash(extractBundledFile(archive,relative)),hash(await readFile(file)),'Bundled resource mismatch: '+relative);
 }
-const bundledPackage=JSON.parse(asar.extractFile(archive,'package.json').toString());
+const bundledPackage=JSON.parse(extractBundledFile(archive,'package.json').toString());
 assert.equal(bundledPackage.version,version);
 assert.equal(bundledPackage.main,'desktop/main.js');
-assert.equal(JSON.parse(asar.extractFile(archive,'dist/config.json')).recipientName,'亲爱的');
-assert.ok(asar.extractFile(archive,'dist/models/hand_landmarker.task').length>1000000,'Hand model missing');
+assert.equal(JSON.parse(extractBundledFile(archive,'dist/config.json')).recipientName,'亲爱的');
+assert.ok(extractBundledFile(archive,'dist/models/hand_landmarker.task').length>1000000,'Hand model missing');
 const digest=createHash('sha256');
 for await(const chunk of createReadStream(path.join(output,artifact)))digest.update(chunk);
 const sha256=digest.digest('hex');

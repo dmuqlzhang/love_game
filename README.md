@@ -91,7 +91,7 @@ npm test
 npm run dist:win
 ```
 
-输出位于 release/LingHui-1.0.0-win-x64.exe（文件名跟随 package.json 版本），同时生成 SHA256SUMS.txt 和 package-report.json。打包会自动准备本地模型、构建网页、使用中性姓名生成桌面资源，再检查 exe 格式、x64 架构和归档中每个页面／模型资源的 SHA-256。无需将 node_modules、dist、release 或模型二进制提交到 Git。
+输出位于 release/LingHui-1.0.1-win-x64.exe（文件名跟随 package.json 版本），同时生成 SHA256SUMS.txt 和 package-report.json。打包会自动准备本地模型、构建网页、使用中性姓名生成桌面资源，再检查 exe 格式、x64 架构和归档中每个页面／模型资源的 SHA-256。无需将 node_modules、dist、release 或模型二进制提交到 Git。
 
 npm run desktop 可启动本机桌面开发版；npm run desktop:smoke 会在隐藏窗口验证姓名配置、画布初始化、摄像头安全上下文，并使用真实模型推理一张空白帧，不申请摄像头。Windows 上可以运行 scripts/smoke-windows.ps1 验证生成的 exe；此检查不会替代真人摄像头、全屏操作和声音试听。
 
@@ -104,11 +104,11 @@ npm run desktop 可启动本机桌面开发版；npm run desktop:smoke 会在隐
 - 发布使用仓库自带的 GITHUB_TOKEN，仅发布 job 申请 contents: write，不需要将个人访问令牌写进源码。
 - 已公开发布的同名 Release 不会被覆盖；失败留下的草稿可以重新运行工作流补齐并发布。
 
-当前版本是 1.0.0。先将本次代码提交并推送到自己的仓库，再发布首个版本：
+当前版本是 1.0.1。先将本次代码提交并推送到自己的仓库，再发布首个版本：
 
 ```sh
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.0.1
+git push origin v1.0.1
 ```
 
 后续版本先提交代码、保持工作区干净，再由 npm 更新版本并创建版本提交及标签：
