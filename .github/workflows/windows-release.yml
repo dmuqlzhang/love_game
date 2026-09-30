@@ -1,4 +1,4 @@
-name: Windows EXE and Release
+name: Desktop Packages and Release
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: windows-${{ github.ref }}
+  group: desktop-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -57,9 +57,60 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+  mac:
+    name: Build and test Mac ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x64
+            runner: macos-15-intel
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run verify:release
+      - run: npm test
+      - name: Build Mac disk image and ZIP
+        run: npm run dist:mac -- --${{ matrix.arch }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - run: npm run verify:mac -- ${{ matrix.arch }}
+      - name: Run distributed Mac app and real hand model without a camera
+        run: npm run smoke:mac -- ${{ matrix.arch }}
+      - name: Save Mac packages and checksums
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: LingHui-mac-${{ matrix.arch }}
+          path: |
+            release/LingHui-*-mac-${{ matrix.arch }}.dmg
+            release/LingHui-*-mac-${{ matrix.arch }}.zip
+            release/SHA256SUMS-mac-${{ matrix.arch }}.txt
+          if-no-files-found: error
+          retention-days: 14
+      - name: Save Mac diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: LingHui-mac-reports-${{ matrix.arch }}
+          path: |
+            release/package-report-mac-${{ matrix.arch }}.json
+            release/smoke-result-mac-${{ matrix.arch }}.json
+          if-no-files-found: ignore
+          retention-days: 14
+
   release:
     name: Publish tagged Release
-    needs: build
+    needs: [build, mac]
     if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
@@ -67,7 +118,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: LingHui-windows-x64
+          pattern: LingHui-*
+          path: downloads
       - name: Verify assets and publish
         shell: bash
         env:
@@ -76,16 +128,22 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
+          mkdir publish
+          cp downloads/LingHui-windows-x64/LingHui-*-win-x64.exe publish/
+          cp downloads/LingHui-mac-arm64/LingHui-*-mac-arm64.{dmg,zip} publish/
+          cp downloads/LingHui-mac-x64/LingHui-*-mac-x64.{dmg,zip} publish/
+          cat downloads/LingHui-windows-x64/SHA256SUMS.txt downloads/LingHui-mac-arm64/SHA256SUMS-mac-arm64.txt downloads/LingHui-mac-x64/SHA256SUMS-mac-x64.txt > publish/SHA256SUMS.txt
+          cd publish
           sha256sum --check SHA256SUMS.txt
           if gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft > existing-draft.txt 2>/dev/null; then
             if [[ "$(cat existing-draft.txt)" != "true" ]]; then
               echo 'A published Release already exists. Use a new version tag.' >&2
               exit 1
             fi
-            gh release upload "$RELEASE_TAG" LingHui-*-win-x64.exe SHA256SUMS.txt --clobber
+            gh release upload "$RELEASE_TAG" LingHui-*.exe LingHui-*.dmg LingHui-*.zip SHA256SUMS.txt --clobber
           elif [[ "$RELEASE_TAG" == *-* ]]; then
-            gh release create "$RELEASE_TAG" LingHui-*-win-x64.exe SHA256SUMS.txt --verify-tag --generate-notes --title "灵绘 $RELEASE_TAG" --draft --prerelease
+            gh release create "$RELEASE_TAG" LingHui-*.exe LingHui-*.dmg LingHui-*.zip SHA256SUMS.txt --verify-tag --generate-notes --title "灵绘 $RELEASE_TAG" --draft --prerelease
           else
-            gh release create "$RELEASE_TAG" LingHui-*-win-x64.exe SHA256SUMS.txt --verify-tag --generate-notes --title "灵绘 $RELEASE_TAG" --draft
+            gh release create "$RELEASE_TAG" LingHui-*.exe LingHui-*.dmg LingHui-*.zip SHA256SUMS.txt --verify-tag --generate-notes --title "灵绘 $RELEASE_TAG" --draft
           fi
           gh release edit "$RELEASE_TAG" --draft=false

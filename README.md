@@ -91,24 +91,43 @@ npm test
 npm run dist:win
 ```
 
-输出位于 release/LingHui-1.0.1-win-x64.exe（文件名跟随 package.json 版本），同时生成 SHA256SUMS.txt 和 package-report.json。打包会自动准备本地模型、构建网页、使用中性姓名生成桌面资源，再检查 exe 格式、x64 架构和归档中每个页面／模型资源的 SHA-256。无需将 node_modules、dist、release 或模型二进制提交到 Git。
+输出位于 release/LingHui-1.0.2-win-x64.exe（文件名跟随 package.json 版本），同时生成 SHA256SUMS.txt 和 package-report.json。打包会自动准备本地模型、构建网页、使用中性姓名生成桌面资源，再检查 exe 格式、x64 架构和归档中每个页面／模型资源的 SHA-256。无需将 node_modules、dist、release 或模型二进制提交到 Git。
 
 npm run desktop 可启动本机桌面开发版；npm run desktop:smoke 会在隐藏窗口验证姓名配置、画布初始化、摄像头安全上下文，并使用真实模型推理一张空白帧，不申请摄像头。Windows 上可以运行 scripts/smoke-windows.ps1 验证生成的 exe；此检查不会替代真人摄像头、全屏操作和声音试听。
+
+## Mac 安装与打包
+
+GitHub Release 提供两种 Mac 版本：M 系列芯片下载 mac-arm64，Intel 芯片下载 mac-x64。推荐下载 DMG，打开后将“灵绘.app”拖入“应用程序”；ZIP 解压后也可将应用拖入“应用程序”。需要 macOS 12 或更新版本。
+
+当前使用临时签名（ad-hoc），没有 Apple Developer ID 签名或 Apple 公证。首次运行可能被 Gatekeeper 拦截；确认下载来自本仓库后，可在“系统设置 → 隐私与安全性”允许打开。无需关闭系统安全功能。摄像头权限仅在用户开启摄像头时申请；可在系统隐私设置中管理。
+
+Mac 姓名配置在 `~/Library/Application Support/灵绘/config.json`，可通过应用菜单“配置 → 修改姓名配置…”打开，保存后按 Cmd+R 刷新。
+
+在 Mac 源码目录运行（Intel 将 arm64 换为 x64）：
+
+```sh
+npm ci
+npm run dist:mac -- --arm64
+npm run verify:mac -- arm64
+npm run smoke:mac -- arm64
+```
+
+产物为 `release/LingHui-1.0.2-mac-arm64.dmg` 和 `.zip`。验证包括 Mac 可执行架构、资源哈希、摄像头用途说明、临时签名、DMG 完整性，以及解压发布 ZIP 后实际启动应用进行模型推理。
 
 ## GitHub 自动构建与 Release
 
 配置在 .github/workflows/windows-release.yml。将源码和 package-lock.json 推送到自己的 GitHub 仓库并启用 Actions 后：
 
-- 普通分支推送、Pull Request、手动运行：Windows runner 测试、打包并运行 exe 自检；通过后在本次 Actions 的 Artifacts 中提供 LingHui-windows-x64，保留 14 天。
-- 推送 v 开头的版本标签：标签必须与 package.json 的版本完全一致；全部检查通过后，自动创建 Release 并上传 exe 和 SHA256SUMS.txt。含连字符的预发布版本会标为 Pre-release。
+- 普通分支推送、Pull Request、手动运行：Windows、Apple 芯片 Mac 和 Intel Mac runner 分别测试、打包并运行应用自检；通过后在 Actions Artifacts 中提供各平台安装包，保留 14 天。
+- 推送 v 开头的版本标签：标签必须与 package.json 的版本完全一致；全部检查通过后，自动创建 Release 并上传 Windows exe、两种 Mac 架构的 DMG/ZIP 和汇总 SHA256SUMS.txt。含连字符的预发布版本会标为 Pre-release。
 - 发布使用仓库自带的 GITHUB_TOKEN，仅发布 job 申请 contents: write，不需要将个人访问令牌写进源码。
 - 已公开发布的同名 Release 不会被覆盖；失败留下的草稿可以重新运行工作流补齐并发布。
 
-当前版本是 1.0.1。先将本次代码提交并推送到自己的仓库，再发布首个版本：
+当前版本是 1.0.2。先将本次代码提交并推送到自己的仓库，再发布首个版本：
 
 ```sh
-git tag v1.0.1
-git push origin v1.0.1
+git tag v1.0.2
+git push origin v1.0.2
 ```
 
 后续版本先提交代码、保持工作区干净，再由 npm 更新版本并创建版本提交及标签：

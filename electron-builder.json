@@ -1,15 +1,45 @@
 {
   "appId": "local.linghui.airdraw",
   "productName": "灵绘",
-  "directories": {"output": "release"},
-  "files": ["dist/**/*", "desktop/**/*", "package.json"],
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist/**/*",
+    "desktop/**/*",
+    "package.json"
+  ],
   "asar": true,
   "npmRebuild": false,
   "win": {
-    "target": [{"target": "portable", "arch": ["x64"]}],
+    "target": [
+      {
+        "target": "portable",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
     "executableName": "LingHui",
     "artifactName": "LingHui-${version}-win-${arch}.${ext}",
     "signAndEditExecutable": false
   },
-  "portable": {"requestExecutionLevel": "user"}
+  "portable": {
+    "requestExecutionLevel": "user"
+  },
+  "mac": {
+    "target": [
+      "dmg",
+      "zip"
+    ],
+    "artifactName": "LingHui-${version}-mac-${arch}.${ext}",
+    "category": "public.app-category.entertainment",
+    "identity": "-",
+    "hardenedRuntime": false,
+    "gatekeeperAssess": false,
+    "notarize": false,
+    "extendInfo": {
+      "NSCameraUsageDescription": "灵绘使用摄像头在本机识别手势，画面不会上传。"
+    }
+  }
 }

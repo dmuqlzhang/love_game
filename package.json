@@ -1,6 +1,6 @@
 {
   "name": "airdraw-lab",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "灵绘：本地手势画布、星光告白与烟花",
   "main": "desktop/main.js",
@@ -16,7 +16,10 @@
     "desktop:smoke": "npm run desktop:build && electron . --smoke-test --smoke-result=smoke-result.json",
     "dist:win": "npm run desktop:build && electron-builder --config electron-builder.json --win portable --x64 --publish never && npm run verify:package",
     "verify:package": "node scripts/verify-package.mjs",
-    "verify:release": "node scripts/release-version.mjs"
+    "verify:release": "node scripts/release-version.mjs",
+    "dist:mac": "npm run desktop:build && electron-builder --config electron-builder.json --mac --publish never",
+    "verify:mac": "node scripts/verify-mac-package.mjs",
+    "smoke:mac": "node scripts/smoke-mac.mjs"
   },
   "engines": {
     "node": ">=22.12.0"
