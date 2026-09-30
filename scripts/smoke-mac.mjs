@@ -20,8 +20,8 @@ try{
   execFileSync('/usr/bin/codesign',['--verify','--deep','--strict',app],{stdio:'inherit'});
   const executable=execFileSync('/usr/libexec/PlistBuddy',['-c','Print :CFBundleExecutable',path.join(app,'Contents/Info.plist')],{encoding:'utf8'}).trim();
   const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;
-  // Intel hosted runners lack a usable GPU. Only this explicit CI check uses software GL.
-  const graphics=env.MAC_SMOKE_SOFTWARE_GL==='1'?['--use-angle=swiftshader','--enable-unsafe-swiftshader']:[];
+  // Intel hosted runners lack a usable GPU. Only this explicit CI check selects the legacy OpenGL backend.
+  const graphics=env.MAC_SMOKE_OPENGL==='1'?['--use-gl=angle','--use-angle=gl']:[];
   const result=spawnSync(path.join(app,'Contents/MacOS',executable),[...graphics,'--smoke-test','--smoke-result='+report],{env,encoding:'utf8',timeout:90000});
   if(result.stdout)console.log(result.stdout);
   if(result.stderr)console.error(result.stderr);

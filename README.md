@@ -112,7 +112,7 @@ npm run verify:mac -- arm64
 npm run smoke:mac -- arm64
 ```
 
-产物为 `release/LingHui-1.0.2-mac-arm64.dmg` 和 `.zip`。验证包括 Mac 可执行架构、资源哈希、摄像头用途说明、临时签名、DMG 完整性，以及解压发布 ZIP 后实际启动应用进行模型推理。Intel CI 虚拟机无可用图形加速，启动检查显式使用软件渲染；普通用户启动不带此参数。
+产物为 `release/LingHui-1.0.2-mac-arm64.dmg` 和 `.zip`。验证包括 Mac 可执行架构、资源哈希、摄像头用途说明、临时签名、DMG 完整性，以及解压发布 ZIP 后实际启动应用进行模型推理。Intel CI 虚拟机的默认图形后端不可用，启动检查显式使用 OpenGL 后端；普通用户启动不带此参数。
 
 ## GitHub 自动构建与 Release
 
