@@ -5,6 +5,7 @@ import { HandTracker } from './camera.js';
 import { RomanceUI } from './romance-ui.js';
 import { FireworksAudio } from './fireworks-audio.js';
 import { loadRomanceConfig } from './romance-config.js';
+import { watchPageVisibility } from './page-visibility.js';
 
 async function startApp() {
 const {config,error}=await loadRomanceConfig(import.meta.env.BASE_URL+'config.json');
@@ -101,7 +102,7 @@ document.addEventListener('fullscreenchange',()=>{
   else $('fullscreen').focus({preventScroll:true});
 });
 document.addEventListener('keydown',event=>{if(romance.key(event)||romance.active)return;if(event.target.matches('input,textarea,button')||event.repeat)return;const key=event.key.toLowerCase();if((event.metaKey||event.ctrlKey)&&key==='z'){event.preventDefault();undo();}else if(!event.metaKey&&!event.ctrlKey&&!event.altKey){if(key==='d')setTool('draw');if(key==='v')setTool('move');if(key==='enter'){event.preventDefault();finish();}if(key==='c')clear();}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){romance.stopEffects();if(state.camera!=='off')stopCamera('页面已切到后台，摄像头自动关闭');else breakInput();}});
+watchPageVisibility(document,()=>{romance.stopEffects();if(state.camera!=='off')stopCamera('页面已切到后台，摄像头自动关闭');else breakInput();});
 window.addEventListener('pagehide',event=>{tracker.stop();romance.stopEffects();if(!event.persisted)sound.dispose();});
 window.addEventListener('blur',()=>{if(pointerDown)releasePointer();});
 window.addEventListener('resize',()=>{breakInput();state.landmarks=null;});
