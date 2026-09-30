@@ -97,13 +97,13 @@ npm run desktop 可启动本机桌面开发版；npm run desktop:smoke 会在隐
 
 ## Mac 安装与打包
 
-GitHub Release 提供两种 Mac 版本：M 系列芯片下载 mac-arm64，Intel 芯片下载 mac-x64。推荐下载 DMG，打开后将“灵绘.app”拖入“应用程序”；ZIP 解压后也可将应用拖入“应用程序”。需要 macOS 12 或更新版本。
+GitHub Release 提供 Apple 芯片（M 系列）的 mac-arm64 版本。Intel x64 包尚未通过运行验证，本版本不发布。推荐下载 DMG，打开后将“灵绘.app”拖入“应用程序”；ZIP 解压后也可将应用拖入“应用程序”。需要 macOS 12 或更新版本。
 
 当前使用临时签名（ad-hoc），没有 Apple Developer ID 签名或 Apple 公证。首次运行可能被 Gatekeeper 拦截；确认下载来自本仓库后，可在“系统设置 → 隐私与安全性”允许打开。无需关闭系统安全功能。摄像头权限仅在用户开启摄像头时申请；可在系统隐私设置中管理。
 
 Mac 姓名配置在 `~/Library/Application Support/灵绘/config.json`，可通过应用菜单“配置 → 修改姓名配置…”打开，保存后按 Cmd+R 刷新。
 
-在 Mac 源码目录运行（Intel 将 arm64 换为 x64）：
+在 Apple 芯片 Mac 源码目录运行：
 
 ```sh
 npm ci
@@ -112,14 +112,14 @@ npm run verify:mac -- arm64
 npm run smoke:mac -- arm64
 ```
 
-产物为 `release/LingHui-1.0.2-mac-arm64.dmg` 和 `.zip`。验证包括 Mac 可执行架构、资源哈希、摄像头用途说明、临时签名、DMG 完整性，以及解压发布 ZIP 后实际启动应用进行模型推理。Intel 云端虚拟机缺少可用 Metal 图形环境，因此 x64 发布包在 Apple 芯片 runner 上通过 Rosetta 启动验证；尚未验证 Intel 原生硬件。
+产物为 `release/LingHui-1.0.2-mac-arm64.dmg` 和 `.zip`。验证包括 Mac 可执行架构、资源哈希、摄像头用途说明、临时签名、DMG 完整性，以及解压发布 ZIP 后实际启动应用进行模型推理。Intel 云端虚拟机缺少可用 Metal 图形环境，Rosetta 下模型初始化也未在检查时限内完成，因此 Intel 包暂不发布。
 
 ## GitHub 自动构建与 Release
 
 配置在 .github/workflows/windows-release.yml。将源码和 package-lock.json 推送到自己的 GitHub 仓库并启用 Actions 后：
 
-- 普通分支推送、Pull Request、手动运行：Windows、Apple 芯片 Mac 和 Mac Rosetta 环境分别测试、打包并运行应用自检；通过后在 Actions Artifacts 中提供各平台安装包，保留 14 天。
-- 推送 v 开头的版本标签：标签必须与 package.json 的版本完全一致；全部检查通过后，自动创建 Release 并上传 Windows exe、两种 Mac 架构的 DMG/ZIP 和汇总 SHA256SUMS.txt。含连字符的预发布版本会标为 Pre-release。
+- 普通分支推送、Pull Request、手动运行：Windows 和 Apple 芯片 Mac runner 分别测试、打包并运行应用自检；通过后在 Actions Artifacts 中提供各平台安装包，保留 14 天。
+- 推送 v 开头的版本标签：标签必须与 package.json 的版本完全一致；全部检查通过后，自动创建 Release 并上传 Windows exe、Apple 芯片 Mac 的 DMG/ZIP 和汇总 SHA256SUMS.txt。含连字符的预发布版本会标为 Pre-release。
 - 发布使用仓库自带的 GITHUB_TOKEN，仅发布 job 申请 contents: write，不需要将个人访问令牌写进源码。
 - 已公开发布的同名 Release 不会被覆盖；失败留下的草稿可以重新运行工作流补齐并发布。
 

@@ -65,8 +65,6 @@ jobs:
         include:
           - arch: arm64
             runner: macos-15
-          - arch: x64
-            runner: macos-15
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 25
     steps:
@@ -80,9 +78,6 @@ jobs:
       - run: npm ci
       - run: npm run verify:release
       - run: npm test
-      - name: Verify Rosetta for the Intel package
-        if: matrix.arch == 'x64'
-        run: /usr/bin/arch -x86_64 /usr/bin/true
       - name: Build Mac disk image and ZIP
         run: npm run dist:mac -- --${{ matrix.arch }}
         env:
@@ -134,8 +129,7 @@ jobs:
           mkdir publish
           cp downloads/LingHui-windows-x64/LingHui-*-win-x64.exe publish/
           cp downloads/LingHui-mac-arm64/LingHui-*-mac-arm64.{dmg,zip} publish/
-          cp downloads/LingHui-mac-x64/LingHui-*-mac-x64.{dmg,zip} publish/
-          cat downloads/LingHui-windows-x64/SHA256SUMS.txt downloads/LingHui-mac-arm64/SHA256SUMS-mac-arm64.txt downloads/LingHui-mac-x64/SHA256SUMS-mac-x64.txt > publish/SHA256SUMS.txt
+          cat downloads/LingHui-windows-x64/SHA256SUMS.txt downloads/LingHui-mac-arm64/SHA256SUMS-mac-arm64.txt > publish/SHA256SUMS.txt
           cd publish
           sha256sum --check SHA256SUMS.txt
           if gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft > existing-draft.txt 2>/dev/null; then
